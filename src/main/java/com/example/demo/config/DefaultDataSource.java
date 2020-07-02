@@ -1,6 +1,5 @@
 package com.example.demo.config;
 
-import com.example.demo.bean.Hikari;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -28,30 +27,31 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "spring.datasource.my")
 public class DefaultDataSource {
 
-    private List<Hikari> hikari = new ArrayList<>();
+    private List<HikariConfig> hikari = new ArrayList<>();
 
-    public List<Hikari> getHikari() {
+    public List<HikariConfig> getHikari() {
         return hikari;
     }
 
-    public void setHikari(List<Hikari> hikari) {
+    public void setHikari(List<HikariConfig> hikari) {
         this.hikari = hikari;
     }
 
     @Bean("dynamicDataSource")
     public DynamicDataSource dynamicDataSource() {
         Map<Object, Object> targetDataSources = new HashMap<>();
-        List<Hikari> hikari = getHikari();
+        List<HikariConfig> hikari = getHikari();
         for (int i = 0; i < hikari.size(); i++) {
-            HikariConfig config = new HikariConfig();
-            config.setDriverClassName(hikari.get(i).getDriverClassName());
-            config.setJdbcUrl(hikari.get(i).getJdbcUrl());
-            config.setUsername(hikari.get(i).getUsername());
-            config.setPassword(hikari.get(i).getPassword());
-            HikariDataSource hikariDataSource = new HikariDataSource(config);
+//            HikariConfig config = new HikariConfig();
+//            config.setDriverClassName(hikari.get(i).getDriverClassName());
+//            config.setJdbcUrl(hikari.get(i).getJdbcUrl());
+//            config.setUsername(hikari.get(i).getUsername());
+//            config.setPassword(hikari.get(i).getPassword());
+            HikariDataSource hikariDataSource = new HikariDataSource(hikari.get(i));
             targetDataSources.put(i + "", hikariDataSource);
         }
         DynamicDataSource dynamicDataSource = new DynamicDataSource();
+        //目标源
         dynamicDataSource.setTargetDataSources(targetDataSources);
         //默认源
         dynamicDataSource.setDefaultTargetDataSource(targetDataSources.get("0"));

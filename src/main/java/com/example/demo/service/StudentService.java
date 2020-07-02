@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.bean.Hikari;
 import com.example.demo.bean.Student;
 import com.example.demo.config.DataSourceContextHolder;
 import com.example.demo.config.DefaultDataSource;
+import com.example.demo.config.DynamicDataSource;
 import com.example.demo.mapper.StudentMapper;
+import com.zaxxer.hikari.HikariConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,12 +43,15 @@ public class StudentService {
         DataSourceContextHolder.clear();
     }
 
+    @Async
     public void allDataSource() {
-        List<Hikari> hikari = defaultDataSource.getHikari();
+        List<HikariConfig> hikari = defaultDataSource.getHikari();
         for (int i = 0; i < 3; i++) {
-            DataSourceContextHolder.setDataSource(i + "");
+            //DataSourceContextHolder.setDataSource(i + "");
+            DynamicDataSource.setDataSource(i + "");
             insertService();
-            DataSourceContextHolder.clear();
+            //DataSourceContextHolder.clear();
+            DynamicDataSource.clear();
             System.out.println("数据库" + hikari.get(i).getJdbcUrl() + "更新完成！");
         }
     }
